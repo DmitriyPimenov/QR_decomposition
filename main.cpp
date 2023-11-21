@@ -5,6 +5,8 @@
 #include "QRDecomposition.h"
 
 int main(int argc, char* argv[]) {
+    std::cout.precision(3);
+
     if (argc <= 1 || argc >= 4) {
         std::cerr << "Invalid number of arguments." << std::endl;
         exit(1);
@@ -29,18 +31,13 @@ int main(int argc, char* argv[]) {
     }
 
     size_t startTime = clock();
-    bool matrixIsNonSingular = getEigenvalues(n, A, eigenvalues, EPS);
+    getEigenvalues(n, A, eigenvalues, EPS);
     size_t endTime = clock();
 
-    if (!matrixIsNonSingular) {
-        std::cout << "The matrix is singular." << std::endl;
-    }
-    else {
-        std::cout << "p.6 Print result:" << std::endl;
-        printResult(eigenvalues, m);
-        std::cout << "p.7.1 Error trace: " << residualTraceNorm(A, eigenvalues) << std::endl;
-        std::cout << "p.7.2 Error length: " << residualLengthNorm(A, eigenvalues) << std::endl;
-    }
+    std::cout << "p.6 Print result:" << std::endl;
+    printResult(eigenvalues, m);
+    std::cout << "p.7.1 Error trace: " << residualTraceNorm(A, eigenvalues) << std::endl;
+    std::cout << "p.7.2 Error length: " << residualLengthNorm(A, eigenvalues) << std::endl;
     std::cout << "p.9 System solution time: " << endTime - startTime << std::endl;
 
     return 0;

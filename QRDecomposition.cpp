@@ -12,7 +12,7 @@ void pr(std::vector<std::vector<double>>& A) { // Не забыть удалит
     std::cout << std::endl;
 }
 
-void QR(std::vector<std::vector<double>>& A, size_t n, size_t ii) {
+void QR(std::vector<std::vector<double>>& A, size_t n) {
     std::vector<std::vector<double>> U(n, std::vector<double> (n, 0.));
     for (size_t i = 0; i < n; ++i)
         U[i][i] = 1.;
@@ -85,16 +85,6 @@ void QR(std::vector<std::vector<double>>& A, size_t n, size_t ii) {
                 U[i][j] = tmp[i][j];
             }
         }
-        if (ii == 0) {
-            std::cout << "x" << std::endl;
-            for (double i : x)
-                std::cout << i << ' ';
-            std::cout << std::endl;
-            std::cout << "U" << std::endl;
-            pr(U);
-            std::cout << "A" << std::endl;
-            pr(A);
-        }
     }
 
     std::vector<std::vector<double>> R = A, Q(n, std::vector<double>(n));
@@ -122,18 +112,18 @@ void QR(std::vector<std::vector<double>>& A, size_t n, size_t ii) {
             }
         }
     }
-    if (ii == 0) {
-        std::cout << "R" << std::endl;
-        pr(R);
-        std::cout << "Q" << std::endl;
-        pr(Q);
-        std::cout << "checkA" << std::endl;
-        pr(checkA);
-        std::cout << "QU" << std::endl;
-        pr(QU);
-        std::cout << "A" << std::endl;
-        pr(A);
-    }
+//    if (ii == 0) {
+//        std::cout << "R" << std::endl;
+//        pr(R);
+//        std::cout << "Q" << std::endl;
+//        pr(Q);
+//        std::cout << "checkA" << std::endl;
+//        pr(checkA);
+//        std::cout << "QU" << std::endl;
+//        pr(QU);
+//        std::cout << "A" << std::endl;
+//        pr(A);
+//    }
 }
 
 void leftMultiplication(std::vector<std::vector<double>>& A, const double cosPhi, const double sinPhi,
@@ -170,10 +160,8 @@ bool getEigenvalues(size_t n, std::vector<std::vector<double>>& A,
         }
     }
 
-    pr(A);
     for (size_t i = 0; i < 1000; ++i)
-        QR(A, n, i);
-    pr(A);
+        QR(A, n);
 
     for (size_t i = 0; i < n; ++i) {
         eigenvalues[i] = A[i][i];

@@ -87,11 +87,21 @@ void prodRU(size_t n, std::vector<std::vector<double>>& A, std::vector<std::vect
     }
 }
 
+double matrixError(size_t n, std::vector<std::vector<double>>& A) {
+    double error = 0;
+    for (size_t i = 1; i < n; ++i) {
+        for (size_t j = 0; j < i; ++j) {
+            error = std::max(error, std::abs(A[i][j]));
+        }
+    }
+    return error;
+}
+
 bool getEigenvalues(size_t n, std::vector<std::vector<double>>& A, std::vector<double>& eigenvalues, const double EPS) {
     std::vector<std::vector<double>> U(n, std::vector<double>(2));
 
     toAlmTrnForm(n, A);
-    for (size_t i = 0; i < 1000; ++i) {
+    while (matrixError(n, A) > EPS) {
         QRbyReflMtd(A, n, U);
         prodRU(n, A, U);
     }

@@ -5,7 +5,7 @@
 #include "QRDecomposition.h"
 
 int main(int argc, char* argv[]) {
-    std::cout.precision(10);
+    std::cout.precision(5);
 
     if (argc <= 1 || argc >= 4) {
         std::cerr << "Invalid number of arguments." << std::endl;

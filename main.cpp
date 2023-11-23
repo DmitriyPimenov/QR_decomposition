@@ -30,6 +30,7 @@ int main(int argc, char* argv[]) {
         readMatrix(argv[2], A);
     }
 
+    double ANorm = Norm2(A);
     size_t startTime = clock();
     getEigenvalues(n, A, eigenvalues, EPS);
     size_t endTime = clock();
@@ -37,7 +38,7 @@ int main(int argc, char* argv[]) {
     std::cout << "p.6 Print result:" << std::endl;
     printResult(eigenvalues, m);
     std::cout << "p.7.1 Error trace: " << residualTraceNorm(A, eigenvalues) << std::endl;
-    std::cout << "p.7.2 Error length: " << residualLengthNorm(A, eigenvalues) << std::endl;
+    std::cout << "p.7.2 Error length: " << std::abs(ANorm - Norm2(A)) << std::endl;
     std::cout << "p.9 System solution time: " << endTime - startTime << std::endl;
 
     return 0;

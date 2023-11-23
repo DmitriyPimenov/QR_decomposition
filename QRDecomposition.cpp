@@ -111,17 +111,15 @@ double residualTraceNorm(std::vector<std::vector<double>>& A, std::vector<double
     return std::abs(result);
 }
 
-double residualLengthNorm(std::vector<std::vector<double>>& A, std::vector<double>& eigenvalues) {
-    double l2A = 0, l2eigenvalues = 0;
+double Norm2(std::vector<std::vector<double>>& A) {
+    double l2A = 0;
     for (size_t i = 0; i < A.size(); ++i) {
         for (size_t j = 0; j < A.size(); ++j) {
             l2A += A[i][j] * A[i][j];
         }
-        l2eigenvalues += eigenvalues[i] * eigenvalues[i];
     }
     l2A = sqrt(l2A);
-    l2eigenvalues = sqrt(l2eigenvalues);
-    return std::abs(l2A - l2eigenvalues);
+    return l2A;
 }
 
 void printResult(const std::vector<double>& x, size_t m) {

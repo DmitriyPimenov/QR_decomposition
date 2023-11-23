@@ -3,129 +3,6 @@
 #include <cmath>
 #include "QRDecomposition.h"
 
-void pr(std::vector<std::vector<double>>& A) { // Не забыть удалить
-    for (size_t i = 0; i < A.size(); ++i) {
-        for (size_t j = 0; j < A.size(); ++j)
-            std::cout << (std::abs(A[i][j]) < 1e-10 ? 0. : A[i][j]) << ' ';
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-}
-
-void QR(std::vector<std::vector<double>>& A, size_t n) {
-    std::vector<std::vector<double>> U(n, std::vector<double> (n, 0.));
-    for (size_t i = 0; i < n; ++i)
-        U[i][i] = 1.;
-    for (size_t k = 0; k < n; ++k) {
-        std::vector<double> a(n - k);
-        for (size_t i = k; i < n; ++i)
-            a[i - k] = A[i][k];
-
-        double aNorm = 0;
-        for (double i : a)
-            aNorm += i * i;
-        aNorm = sqrt(aNorm);
-
-        std::vector<double> x = a;
-        x[0] -= aNorm;
-        double xNorm = 0;
-        for (double i : x)
-            xNorm += i * i;
-        xNorm = sqrt(xNorm);
-        for (double& i : x)
-            i /= xNorm;
-        if (xNorm < 1e-10) {
-            x[0] = A[k][k] > 0 ? 1. : -1.;
-            for (size_t i = 1; i < n - k; ++i) {
-                x[i] = 0.;
-            }
-        }
-
-        std::vector<std::vector<double>> u(n - k, std::vector<double> (n - k, 0.));
-        for (size_t i = 0; i < n - k; ++i)
-            u[i][i] = 1.;
-        for (size_t i = 0; i < n - k; ++i) {
-            for (size_t j = 0; j < n - k; ++j) {
-                u[i][j] -= 2 * x[i] * x[j];
-            }
-        }
-        std::vector<std::vector<double>> tmp(n - k, std::vector<double> (n - k, 0.));
-        for (size_t i = 0; i < n - k; ++i) {
-            for (size_t j = 0; j < n - k; ++j) {
-                for (size_t t = 0; t < n - k; ++t) {
-                    tmp[i][j] += u[i][t] * A[k + t][k + j];
-                }
-            }
-        }
-        for (size_t i = 0; i < n - k; ++i) {
-            for (size_t j = 0; j < n - k; ++j) {
-                A[k + i][k + j] = tmp[i][j];
-            }
-        }
-
-        std::vector<std::vector<double>> ut(n, std::vector<double> (n, 0.));
-        for (size_t i = 0; i < n; ++i) {
-            ut[i][i] = 1.;
-        }
-        for (size_t i = 0; i < n - k; ++i) {
-            for (size_t j = 0; j < n - k; ++j) {
-                ut[k + i][k + j] = u[i][j];
-            }
-        }
-        tmp = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.));
-        for (size_t i = 0; i < n; ++i) {
-            for (size_t j = 0; j < n; ++j) {
-                for (size_t t = 0; t < n; ++t) {
-                    tmp[i][j] += ut[i][t] * U[t][j];
-                }
-            }
-        }
-        for (size_t i = 0; i < n; ++i) {
-            for (size_t j = 0; j < n; ++j) {
-                U[i][j] = tmp[i][j];
-            }
-        }
-    }
-
-    std::vector<std::vector<double>> R = A, Q(n, std::vector<double>(n));
-    for (size_t i = 0; i < n; ++i) {
-        for (size_t j = 0; j < n; ++j) {
-            Q[i][j] = U[j][i]; // Q = U^t
-        }
-    }
-    for (size_t i = 0; i < n; ++i) {
-        for (size_t j = 0; j < n; ++j) {
-            A[i][j] = 0.;
-            for (size_t t = 0; t < n; ++t) {
-                A[i][j] += R[i][t] * Q[t][j];
-            }
-        }
-    }
-
-    std::vector<std::vector<double>> checkA(n, std::vector<double> (n, 0.));
-    std::vector<std::vector<double>> QU = checkA;
-    for (size_t i = 0; i < n; ++i) {
-        for (size_t j = 0; j < n; ++j) {
-            for (size_t t = 0; t < n; ++t) {
-                checkA[i][j] += Q[i][t] * R[t][j];
-                QU[i][j] += Q[i][t] * U[t][j];
-            }
-        }
-    }
-//    if (ii == 0) {
-//        std::cout << "R" << std::endl;
-//        pr(R);
-//        std::cout << "Q" << std::endl;
-//        pr(Q);
-//        std::cout << "checkA" << std::endl;
-//        pr(checkA);
-//        std::cout << "QU" << std::endl;
-//        pr(QU);
-//        std::cout << "A" << std::endl;
-//        pr(A);
-//    }
-}
-
 void leftMultiplication(std::vector<std::vector<double>>& A, const double cosPhi, const double sinPhi,
                         const size_t i, const size_t j, const size_t k) {
     double xi = A[i][k], xj = A[j][k];
@@ -140,13 +17,12 @@ void rightMultiplication(std::vector<std::vector<double>>& A, const double cosPh
     A[k][j] = xi * sinPhi + xj * cosPhi;
 }
 
-bool getEigenvalues(size_t n, std::vector<std::vector<double>>& A,
-                    std::vector<double>& eigenvalues, const double EPS) {
-    pr(A);
+// reducing the matrix to an almost upper triangular form using the rotation method
+void toAlmTrnForm(size_t n, std::vector<std::vector<double>>& A) {
     for (size_t j = 0; j < n - 2; ++j) {
         for (size_t i = j + 2; i < n; ++i) {
             double x = A[j + 1][j], y = A[i][j];
-            if (std::abs(x) + std::abs(y) < EPS) {
+            if (std::abs(x) + std::abs(y) < 1e-10) {
                 continue;
             }
             double cosPhi = x / sqrt(x*x + y*y); // Lemma 2
@@ -159,9 +35,66 @@ bool getEigenvalues(size_t n, std::vector<std::vector<double>>& A,
             }
         }
     }
+}
 
-    for (size_t i = 0; i < 1000; ++i)
-        QR(A, n);
+// QR matrix decomposition using the reflection method
+void QRbyReflMtd(std::vector<std::vector<double>>& A, size_t n, std::vector<std::vector<double>>& U) {
+    for (size_t k = 0; k < n; ++k) {
+        double sk = 0.;
+        if (k < n - 1) {
+            sk = A[k + 1][k] * A[k + 1][k]; // (15) p.118
+        }
+        std::vector<double> x(2, 0.);
+        x[0] = A[k][k] - sqrt(A[k][k] * A[k][k] + sk); // (17) p.118
+        if (k < n - 1) {
+            x[1] = A[k + 1][k]; // (17) p.118
+        }
+        double xNorm = sqrt(x[0] * x[0] + sk); // (18) p.119
+        if (xNorm < 1e-10) { // if x coordinates are too small, in particular if x = (0, 0)
+            x[0] = A[k][k] < 0 ? -1. : 1.;
+        }
+        else { // (19) p.119
+            x[0] /= xNorm;
+            x[1] /= xNorm;
+        }
+
+        U[k] = x;
+        if (k < n - 1) { // 3. p.119-120
+            double u11 = 1 - 2*x[0]*x[0], u12 = -2*x[0]*x[1], u22 = 1 - 2*x[1]*x[1];
+            for (size_t i = k; i < n; ++i) {
+                double A1 = A[k][i], A2 = A[k + 1][i];
+                A[k][i] = u11 * A1 + u12 * A2;
+                A[k + 1][i] = u12 * A1 + u22 * A2;
+            }
+        }
+        else {
+            A[k][k] *= x[0];
+        }
+    }
+}
+
+void prodRU(size_t n, std::vector<std::vector<double>>& A, std::vector<std::vector<double>>& U) {
+    for (size_t j = 0; j < n - 1; ++j) {
+        for (size_t i = 0; i <= j + 1; ++i) {
+            double Rij = A[i][j], Rij1 = A[i][j + 1];
+            double u11 = 1 - 2*U[j][0]*U[j][0], u12 = -2*U[j][0]*U[j][1], u22 = 1 - 2*U[j][1]*U[j][1];
+            A[i][j] = Rij * u11 + Rij1 * u12;
+            A[i][j + 1] = Rij * u12 + Rij1 * u22;
+        }
+    }
+    for (size_t i = 0; i < n; ++i) {
+        A[i][n - 1] *= U[n - 1][0];
+    }
+}
+
+bool getEigenvalues(size_t n, std::vector<std::vector<double>>& A, std::vector<double>& eigenvalues, const double EPS) {
+    std::vector<std::vector<double>> U(n, std::vector<double>(2));
+
+    toAlmTrnForm(n, A);
+    for (size_t i = 0; i < 1000; ++i) {
+        QRbyReflMtd(A, n, U);
+        prodRU(n, A, U);
+    }
 
     for (size_t i = 0; i < n; ++i) {
         eigenvalues[i] = A[i][i];

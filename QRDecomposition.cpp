@@ -25,10 +25,10 @@ void toAlmTrnForm(size_t n, std::vector<std::vector<double>>& A) {
             if (std::abs(x) + std::abs(y) < 1e-10) {
                 continue;
             }
-            double cosPhi = x / sqrt(x*x + y*y); // Lemma 2
-            double sinPhi = -y / sqrt(x*x + y*y); // Lemma 2
-            for (size_t k = j; k < n; ++k) { // Lemma 5
-                leftMultiplication(A, cosPhi, sinPhi, j + 1, i, k); // Lemma 4
+            double cosPhi = x / sqrt(x*x + y*y); // Lemma 2 p.43
+            double sinPhi = -y / sqrt(x*x + y*y); // Lemma 2 p.43
+            for (size_t k = j; k < n; ++k) { // Lemma 5 p.45
+                leftMultiplication(A, cosPhi, sinPhi, j + 1, i, k); // Lemma 4 p.45
             }
             for (size_t k = 0; k < n; ++k) {
                 rightMultiplication(A, cosPhi, sinPhi, j + 1, i, k);
